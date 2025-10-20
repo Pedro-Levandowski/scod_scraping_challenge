@@ -5,6 +5,5 @@ if __name__ == '__main__':
 
     html = site_teste.fetch_html()
 
-    print("len:", len(html))
-    print(html[:120].replace("\n", " "))
+    print(site_teste.analisar_linhas_tabela(html))
     
