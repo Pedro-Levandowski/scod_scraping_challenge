@@ -6,12 +6,12 @@ from src.downloader import Downloader
 from src.extractor import Extractor
 
 if __name__ == '__main__':
-    BASE_URL = 'https://arth-inacio.github.io/scod_scraping_challenge/'
+    BASE_URL = 'https://arth-inacio.github.io/scod_scraping_challenge/' #define a URL base para a extração de dados
 
-    with requests.Session() as s:
-        scraper = Scraper(BASE_URL, timeout=10, session=s)
-        downloader = Downloader(timeout=15, max_tentativas=2, session=s)
-        extractor = Extractor()
+    with requests.Session() as s: #executa o código abaixo levando em consideração que a Session criada está na variável s
+        scraper = Scraper(BASE_URL, timeout=10, session=s) #Instancia um Scraper utilizando URL base definida, seta um timeout de 10s e usa a session s
+        downloader = Downloader(timeout=15, max_tentativas=2, session=s) #instancia um Downloader setando um timeout de 15s, maximo de tentativas = 2 e usa a session s
+        extractor = Extractor() #instancia um Extractor
 
         html = scraper.fetch_html()
         linhas = scraper.analisar_linhas_tabela(html)
