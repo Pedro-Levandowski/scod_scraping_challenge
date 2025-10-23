@@ -64,6 +64,11 @@ class Scraper:
             for idx, linha in enumerate(linhas, start=1): #cria um laço de repetição que pegará uma das linhas selecionadas acima por vez, baseado no index que irá ser incrementado 1 por 1 até percorrer todas as linhas da tabela
                 colunas = linha.select("td") #seleciona todas as colunas da linha do index
 
+                codigo_linha = linha.get('data-cod_lancamento') #pega o codigo da linha em questão
+
+                if not codigo_linha: #se a linha nao conter codigo (baseado no atributo css 'data-cod_lancamento'), um ValueError será lançado especificando o problema
+                    raise ValueError(f'Linha #{idx}: Não foi possível encontrar o código da linha ("data-cod_lancamento")')
+
                 if not len(colunas) == 7: #se a linha do index não retornar exatamente 7 colunas será lançado um ValueError especificando o erro
                     raise ValueError(f'Linha #{idx}: Eram esperadas 7 colunas, foram encontradas {len(colunas)} colunas')
                 
@@ -92,7 +97,8 @@ class Scraper:
                     "vencimento": vencimento,
                     "valor": valor,
                     "status": status,
-                    "boleto_url": boleto_url
+                    "boleto_url": boleto_url,
+                    "codigo_linha": codigo_linha
                 }
                 dados.append(dado) #adiciona os dados da linha à lista de dados
 

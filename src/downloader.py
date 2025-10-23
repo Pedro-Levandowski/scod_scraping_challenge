@@ -10,6 +10,10 @@ class Downloader:
         self.session = session
     
     def download_pdf(self, url:str, caminho_destino:str, overwrite:bool = False, verificar_pdf:bool = True) -> str:
+        """
+                 
+        """
+
         if not overwrite and Path(caminho_destino).exists():
             return caminho_destino
 
@@ -28,24 +32,38 @@ class Downloader:
         try:
             for tentativa in range(self.max_tentativas + 1):
                 try:
-                    # FECHA AUTOMATICAMENTE ao sair do bloco
+
                     with session.get(url, timeout=self.timeout, stream=True) as response:
                         status_code = response.status_code
 
                         if status_code != 200:
-                            # retry só para 5xx
+                           
                             if status_code in {500, 502, 503, 504} and tentativa < self.max_tentativas:
                                 time.sleep(1 * (tentativa + 1))
                                 continue
                             raise ValueError(f'HTTP ({status_code}) ao tentar baixar a URL: {url}')
 
-                        # --- salvar com segurança em .tmp ---
                         tmp_path = f"{caminho_destino}.tmp"
                         salvou_algo = False
 
+                        content_type = response.headers.get("Content-Type", "").lower()
+
                         with open(tmp_path, "wb") as arquivo:
+                            primeiro_chunk = None
+
                             for chunk in response.iter_content(chunk_size=65536):
                                 if not chunk:
+                                    continue
+
+                                if primeiro_chunk is None:
+                                    primeiro_chunk = chunk
+
+                                    if verificar_pdf:
+                                        if 'pdf' not in content_type and not primeiro_chunk.startswith(b'%PDF-'):
+                                            raise ValueError(f'O conteúdo não aparenta ser PDF (Content-Type = {content_type})')
+                                        
+                                    arquivo.write(primeiro_chunk)
+                                    salvou_algo = True
                                     continue
 
                                 arquivo.write(chunk)
@@ -59,7 +77,7 @@ class Downloader:
 
                 except requests.RequestException as erro:
                     if tentativa < self.max_tentativas:
-                        time.sleep(1 * (tentativa + 1))   # 1s, 2s, 3s...
+                        time.sleep(1 * (tentativa + 1))  
                         continue
                     raise ValueError(f'Erro de rede ao baixar {url}: {erro.__class__.__name__}') from erro
             raise ValueError(f"Falha ao baixar {url} após {self.max_tentativas + 1} tentativas")
