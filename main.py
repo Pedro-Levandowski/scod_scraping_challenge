@@ -13,19 +13,19 @@ if __name__ == '__main__':
         downloader = Downloader(timeout=15, max_tentativas=2, session=s) #instancia um Downloader setando um timeout de 15s, maximo de tentativas = 2 e usa a session s
         extractor = Extractor() #instancia um Extractor
 
-        html = scraper.fetch_html()
-        linhas = scraper.analisar_linhas_tabela(html)
-        assert linhas, "Nenhuma linha encontrada na tabela."
+        html = scraper.fetch_html() #baixa o código HTML utilzando a função fetch_html() da classe Scraper e atribui à variável html
+        linhas = scraper.analisar_linhas_tabela(html) #atribui os dados das linhas a variável linhas
+        assert linhas, "Nenhuma linha encontrada na tabela." #garante que ao menos uma linha tenha sido encontrada
 
-        total_linhas = len(linhas)
-        ok = 0
-        falhas = 0
+        total_linhas = len(linhas) #pega o total de linhas com dados retornadas e atribui à variável total_linhas
+        ok = 0 #cria a variável ok que inicialmente será 0
+        falhas = 0 #cria a variável falhas que inicialmente será 0
 
-        for linha in linhas:
-            try:
-                codigo_linha = linha['codigo_linha']
-                nome_arquivo = f'{codigo_linha}.pdf'
-                destino = Path('boletos') / nome_arquivo
+        for linha in linhas: #percorre um conjunto de dados das linhas por vez
+            try: #tenta executar o bloco de código abaixo
+                codigo_linha = linha['codigo_linha'] #pega o codigo_linha dos dados da linha extraida e atribui à variável codigo_linha
+                nome_arquivo = f'{codigo_linha}.pdf'  #cria uma variável nome_arquivo e define como sendo o código da linha com a extensão .pdf
+                destino = Path('boletos') / nome_arquivo #define que o destino do arquivo será a pasta boletos e o arquivo terá o nome definido acima
 
                 print(f'[BAIXANDO] {codigo_linha} -> {destino}')
                 downloader.download_pdf(linha['boleto_url'], str(destino), sobrescrever=False, verificar_pdf=True)
