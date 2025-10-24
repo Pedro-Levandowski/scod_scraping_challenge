@@ -49,7 +49,7 @@ def formatar_minuscula(string: str) -> str:
     """
     string = string.replace("\xa0", " ") #Trata NBSP
     string = unicodedata.normalize("NFD", string) #normaliza a string, trocando caracteres que possuem acento embutido pela base. ex: 'á' vira 'a' e 'ç' vira 'c'
-    string = "".join(caractere for caractere in string if not unicodedata.combining(caractere)) #pega cada caracter da string e junta novamente somente os que não são combinantes (acentos e outros caracteres especiais)
+    string = "".join(caractere for caractere in string if not unicodedata.combining(caractere)) #pega cada caractere da string e junta novamente somente os que não são combinantes (acentos e outros caracteres especiais)
     return string.lower() #a função retorna a string com todas as mudanças acima em minúsculo
 
 def apenas_digitos(string: str) -> str:
